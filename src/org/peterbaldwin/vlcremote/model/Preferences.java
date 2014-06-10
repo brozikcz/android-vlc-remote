@@ -17,13 +17,18 @@
 
 package org.peterbaldwin.vlcremote.model;
 
+import com.google.gson.Gson;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.format.DateUtils;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.peterbaldwin.vlcremote.tvmodel.Show;
 import org.peterbaldwin.vlcremote.widget.Buttons;
 
 /**
@@ -62,6 +67,9 @@ public final class Preferences {
     public final static int TEXT_SMALL = 0;
     public final static int TEXT_MEDIUM = 1;
     public final static int TEXT_LARGE = 2;
+    private static final String KEY_SHOW_ID = "show_id";
+    private static final String KEY_SHOW_TITLE = "show_title";
+    private static final String KEY_SEASON_NUM = "season_num";
     
     public Preferences(SharedPreferences preferences) {
         mPreferences = preferences;
@@ -283,4 +291,29 @@ public final class Preferences {
             return new ArrayList<String>(0);
         }
     }
+
+    public int getShowId() {
+        return mPreferences.getInt(KEY_SHOW_ID, 0);
+    }
+    
+    public boolean setShowId(int id) {
+        return mPreferences.edit().putInt(KEY_SHOW_ID, id).commit();
+    }
+
+    public int getSeasonNum() {
+        return mPreferences.getInt(KEY_SEASON_NUM, 0);
+    }
+    
+    public boolean setSeasonNum(int num) {
+        return mPreferences.edit().putInt(KEY_SEASON_NUM, num).commit();
+    }
+
+    public String getShowTitle() {
+        return mPreferences.getString(KEY_SHOW_TITLE, null);
+    }
+    
+    public boolean setShowTitle(String title) {
+        return mPreferences.edit().putString(KEY_SHOW_TITLE, title).commit();
+    }
+    
 }

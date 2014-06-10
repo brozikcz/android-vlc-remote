@@ -45,10 +45,12 @@ import android.widget.SlidingDrawer;
 import android.widget.TabHost;
 import android.widget.TabHost.TabContentFactory;
 import android.widget.ViewFlipper;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.peterbaldwin.client.android.vlcremote.R;
 import org.peterbaldwin.vlcremote.fragment.ArtFragment;
 import org.peterbaldwin.vlcremote.fragment.BrowseFragment;
@@ -59,6 +61,7 @@ import org.peterbaldwin.vlcremote.fragment.PlaybackFragment;
 import org.peterbaldwin.vlcremote.fragment.PlayingFragment;
 import org.peterbaldwin.vlcremote.fragment.PlaylistFragment;
 import org.peterbaldwin.vlcremote.fragment.StatusFragment;
+import org.peterbaldwin.vlcremote.fragment.TvShowsFragment;
 import org.peterbaldwin.vlcremote.fragment.VolumeFragment;
 import org.peterbaldwin.vlcremote.intent.Intents;
 import org.peterbaldwin.vlcremote.listener.BrowseDrawerListener;
@@ -96,9 +99,10 @@ public class PlaybackActivity extends FragmentActivity implements TabHost.OnTabC
     private static final String TAB_MEDIA = "media";
     private static final String TAB_PLAYLIST = "playlist";
     private static final String TAB_BROWSE = "browse";
+    private static final String TAB_TV_SHOWS = "tvshows";
     private static final String TAB_NAVIGATION = "navigation";
     
-    private static final int TAB_NAVIGATION_INDEX = 3;
+    private static final int TAB_NAVIGATION_INDEX = 4;
 
     private static final int MAX_VOLUME = 1024;
 
@@ -175,6 +179,9 @@ public class PlaybackActivity extends FragmentActivity implements TabHost.OnTabC
             fu.findOrReplaceOptionalFragment(this, R.id.fragment_navigation, Tags.FRAGMENT_NAVIGATION, NavigationFragment.class);
             fu.findOrReplaceFragment(R.id.fragment_playlist, Tags.FRAGMENT_PLAYLIST, PlaylistFragment.class);
             browse = fu.findOrReplaceFragment(R.id.fragment_browse, Tags.FRAGMENT_BROWSE, BrowseFragment.class);
+            
+            fu.findOrReplaceFragment(R.id.fragment_tvshows, Tags.FRAGMENT_TV_SHOWS, TvShowsFragment.class);
+            
             fu.findOrReplaceFragment(R.id.fragment_playback, Tags.FRAGMENT_PLAYBACK, PlaybackFragment.class);
             fu.findOrReplaceFragment(R.id.fragment_info, Tags.FRAGMENT_INFO, InfoFragment.class);
             fu.findOrReplaceOptionalFragment(this, R.id.fragment_art, Tags.FRAGMENT_ART, ArtFragment.class);
@@ -195,6 +202,7 @@ public class PlaybackActivity extends FragmentActivity implements TabHost.OnTabC
                 fu.removeFragmentsByTag(
                     Tags.FRAGMENT_PLAYBACK, Tags.FRAGMENT_INFO, Tags.FRAGMENT_BUTTONS,
                     Tags.FRAGMENT_VOLUME, Tags.FRAGMENT_BOTTOMBAR, Tags.FRAGMENT_BROWSE,
+                    Tags.FRAGMENT_TV_SHOWS,
                     Tags.FRAGMENT_NAVIGATION, Tags.FRAGMENT_PLAYLIST
                 );
             }
@@ -219,6 +227,7 @@ public class PlaybackActivity extends FragmentActivity implements TabHost.OnTabC
         addTab(TAB_MEDIA, R.string.nowplaying_title, R.drawable.ic_tab_artists);
         addTab(TAB_PLAYLIST, R.string.tab_playlist, R.drawable.ic_tab_playlists);
         addTab(TAB_BROWSE, R.string.goto_start, R.drawable.ic_tab_playback);
+        addTab(TAB_TV_SHOWS, R.string.tab_tv_shows, R.drawable.ic_tab_playback);
         addTab(TAB_NAVIGATION, R.string.tab_dvd, R.drawable.ic_tab_albums);
         if(isHideDVDTab) {
             mTabHost.getTabWidget().removeView(mTabHost.getTabWidget().getChildTabViewAt(TAB_NAVIGATION_INDEX));
@@ -309,7 +318,8 @@ public class PlaybackActivity extends FragmentActivity implements TabHost.OnTabC
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.playback_options, menu);            
         getMenuInflater().inflate(R.menu.playlist_options, menu);            
-        getMenuInflater().inflate(R.menu.browse_options, menu);            
+        getMenuInflater().inflate(R.menu.browse_options, menu);        
+        getMenuInflater().inflate(R.menu.tvshows_options, menu);    
         return true;
     }
 
@@ -321,6 +331,10 @@ public class PlaybackActivity extends FragmentActivity implements TabHost.OnTabC
         boolean defaultVisibility = mTabHost == null || isCurrentTab(TAB_MEDIA) || isCurrentTab(TAB_NAVIGATION);
         boolean isAllButtonsVisible = isBottomActionbarVisible || (mButtonsVisibleListener != null && mButtonsVisibleListener.isAllButtonsVisible());
         boolean isButtonGroupVisible = isCurrentTab(TAB_MEDIA) && !isAllButtonsVisible;
+        
+        boolean isShowsVisible = isCurrentTab(TAB_TV_SHOWS);
+        
+        
         menu.findItem(R.id.menu_preferences).setVisible(defaultVisibility);
         menu.findItem(R.id.menu_help).setVisible(defaultVisibility);
         menu.findItem(R.id.menu_clear_playlist).setVisible(isPlaylistVisible);
@@ -329,6 +343,9 @@ public class PlaybackActivity extends FragmentActivity implements TabHost.OnTabC
         menu.findItem(R.id.menu_parent).setVisible(isBrowseVisible);
         menu.findItem(R.id.menu_set_home).setVisible(isBrowseVisible);
         menu.findItem(R.id.menu_text_size).setVisible(isBrowseVisible);
+        menu.findItem(R.id.menu_refresh_shows).setVisible(isShowsVisible);
+        menu.findItem(R.id.menu_go_up).setVisible(isShowsVisible);
+        
         if(isButtonGroupVisible) {
             Buttons.setupMenu(menu, Preferences.get(this));
         }
@@ -702,14 +719,15 @@ public class PlaybackActivity extends FragmentActivity implements TabHost.OnTabC
             switch(i) {
                 case 1: return new PlaylistFragment();
                 case 2: return new BrowseFragment();
-                case 3: return NavigationFragment.lockableInstance();
+                case 3: return new TvShowsFragment();
+                case 4: return NavigationFragment.lockableInstance();
                 default: return new PlayingFragment();
             }
         }
 
         @Override
         public int getCount() {
-            return isHideDVDSet ? 3 : 4;
+            return isHideDVDSet ? 4 : 5;
         }
     }
     

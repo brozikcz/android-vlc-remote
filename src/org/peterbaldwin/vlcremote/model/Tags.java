@@ -31,6 +31,7 @@ public class Tags {
     public static final String FRAGMENT_BUTTONS = "vlc:buttons";
     public static final String FRAGMENT_INFO = "vlc:info";
     public static final String FRAGMENT_BROWSE = "vlc:browse";
+    public static final String FRAGMENT_TV_SHOWS = "vlc:tvshows";
     public static final String FRAGMENT_PLAYLIST = "vlc:playlist";
     public static final String FRAGMENT_VOLUME = "vlc:volume";
 }

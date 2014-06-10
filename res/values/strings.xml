@@ -162,6 +162,9 @@
     
     <!-- Label for DVD navigation tab -->
     <string name="tab_dvd">DVD</string>
+        
+    <!-- Label for DVD navigation tab -->
+    <string name="tab_tv_shows">TV Shows</string>
     
     <!-- Label for playlist tab -->
     <string name="tab_playlist">Playlist</string>

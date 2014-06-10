@@ -9,6 +9,7 @@
     <item type="id" name="fragment_volume" />
     <item type="id" name="fragment_playlist" />
     <item type="id" name="fragment_browse" />
+  	<item type="id" name="fragment_tvshows" />
     <item type="id" name="fragment_playback" />
     <item type="id" name="fragment_navigation" />
     <item type="id" name="tab_media" />
