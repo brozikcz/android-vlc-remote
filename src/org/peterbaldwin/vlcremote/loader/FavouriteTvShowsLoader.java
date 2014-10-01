@@ -127,7 +127,7 @@ public class FavouriteTvShowsLoader extends ModelLoader<Remote<ArrayList<Object>
                     } else if (type == SEASONS_LIST) {
                         elem = (Season) gson.fromJson(obj, Season.class);
                     } else {
-                        elem = (Episode)  gson.fromJson(obj, Episode.class);
+                        elem = (Episode) gson.fromJson(obj, Episode.class);
                     }
                     array.add(elem);
                 }

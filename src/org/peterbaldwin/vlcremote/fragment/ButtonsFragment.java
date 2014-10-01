@@ -234,4 +234,10 @@ public final class ButtonsFragment extends MediaFragment implements View.OnClick
             onStatusChanged(status);
         }
     }
+
+    @Override
+    public boolean onBackPressed() {
+        // TODO Auto-generated method stub
+        return false;
+    }
 }

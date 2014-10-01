@@ -65,4 +65,10 @@ public final class BottomActionbarFragment extends MediaFragment implements Relo
         }
     }
 
+    @Override
+    public boolean onBackPressed() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
 }

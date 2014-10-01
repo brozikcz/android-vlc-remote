@@ -342,4 +342,10 @@ public class PlaylistFragment extends MediaListFragment implements
             onStatusChanged(status);
         }
     }
+
+    @Override
+    public boolean onBackPressed() {
+        // TODO Auto-generated method stub
+        return false;
+    }
 }

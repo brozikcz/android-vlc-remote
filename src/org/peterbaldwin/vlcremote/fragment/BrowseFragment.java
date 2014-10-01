@@ -292,5 +292,11 @@ public class BrowseFragment extends MediaListFragment implements
         mAdapter.setDirectory(null);
     }
 
+    @Override
+    public boolean onBackPressed() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
     // TODO: Automatically reload directory when connection is restored
 }

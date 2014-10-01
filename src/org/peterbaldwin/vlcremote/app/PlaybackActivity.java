@@ -48,8 +48,10 @@ import android.widget.ViewFlipper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.peterbaldwin.client.android.vlcremote.R;
 import org.peterbaldwin.vlcremote.fragment.ArtFragment;
@@ -147,6 +149,21 @@ public class PlaybackActivity extends FragmentActivity implements TabHost.OnTabC
     private List<MediaServerListener> mMediaServerListeners = new ArrayList<MediaServerListener>();
     
     private Map<String, Reloadable> mReloadables = new HashMap<String, Reloadable>();
+    
+    @Override
+    public void onBackPressed() {
+        
+        Iterator<Entry<String, Reloadable>> it = mReloadables.entrySet().iterator();
+        while (it.hasNext()) {
+           
+            Map.Entry pairs = (Map.Entry)it.next();
+            if(mReloadables.get(pairs.getKey()).onBackPressed()) {
+                return;
+            }
+        }
+        
+        super.onBackPressed();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

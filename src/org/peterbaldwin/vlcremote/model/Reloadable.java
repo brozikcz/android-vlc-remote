@@ -31,4 +31,7 @@ public interface Reloadable {
      */
     public void reload(Bundle args);
     
+    
+    public boolean onBackPressed();
+    
 }

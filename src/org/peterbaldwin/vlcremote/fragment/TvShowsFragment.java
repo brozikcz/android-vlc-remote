@@ -20,21 +20,38 @@ package org.peterbaldwin.vlcremote.fragment;
 import com.google.gson.Gson;
 
 import android.app.Activity;
+import android.content.Context;
+import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.peterbaldwin.client.android.vlcremote.R;
 import org.peterbaldwin.vlcremote.loader.FavouriteTvShowsLoader;
 import org.peterbaldwin.vlcremote.model.Preferences;
@@ -108,14 +125,7 @@ public class TvShowsFragment extends MediaListFragment implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_go_up:
-                if (seasonNum > 0) {
-                    seasonNum = 0;
-                } else if (showId > 0) {
-                    showId = 0;
-                    showTitle = null;
-                }
-
-                getLoaderManager().restartLoader(0, null, this);
+                goUpOne();
                 return true;
             case R.id.menu_refresh_shows:
                 getLoaderManager().restartLoader(0, null, this);
@@ -123,6 +133,23 @@ public class TvShowsFragment extends MediaListFragment implements
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private boolean goUpOne() {
+        boolean changed = false;
+        
+        if (seasonNum > 0) {
+            seasonNum = 0;
+            changed = true;
+        } else if (showId > 0) {
+            showId = 0;
+            showTitle = null;
+            changed = true;
+        }
+
+        getLoaderManager().restartLoader(0, null, this);
+        
+        return changed;
     }
 
     @Override
@@ -188,6 +215,8 @@ public class TvShowsFragment extends MediaListFragment implements
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
+        
+        Log.d(TAG, "onListItemClick");
 
         Object item = mAdapter.getItem(position);
 
@@ -200,10 +229,13 @@ public class TvShowsFragment extends MediaListFragment implements
             getShowSeasonsOrEpisodes(showId, seasonNum);
         } else {
             Episode ep = (Episode) item;
+            if(!ep.getWatched()) {
+                v.setBackgroundColor(Color.parseColor("#1d4a38"));
+            } else {
+                v.setBackgroundColor(Color.TRANSPARENT); 
+            }
             
-            
-            // play episode
-            // getShowSeasonsOrEpisodes(showId, seasonNum);
+            new ToggleEpisodeWatched( (LoaderCallbacks<?>) this, v).execute(ep.getId());
         }
 
     }
@@ -238,8 +270,6 @@ public class TvShowsFragment extends MediaListFragment implements
 
         setTitle(title);
         
-        mAdapter.notifyDataSetChanged();
-        
         this.getActivity().invalidateOptionsMenu();        
     }
 
@@ -248,4 +278,67 @@ public class TvShowsFragment extends MediaListFragment implements
         Log.d(TAG, "onLoaderRest");
         mAdapter.setData(null);
     }
+
+    @Override
+    public boolean onBackPressed() {
+        if(goUpOne()) {
+            return true;
+        }
+        return false;
+    }
+    
+    private class ToggleEpisodeWatched extends AsyncTask<Integer, Integer, Integer> {
+        
+        private LoaderManager.LoaderCallbacks<?> context;
+        private View elementView;
+        
+        public ToggleEpisodeWatched(LoaderCallbacks<?> loaderCallbacks, View v) {
+            this.context = (LoaderCallbacks<?>) loaderCallbacks;
+            this.elementView = v;
+        }
+
+        protected Integer doInBackground(Integer... eps) {
+            
+            int epId = eps[0];
+            
+            HttpClient hc = new DefaultHttpClient();
+            HttpGet request = new HttpGet("http://tvhelper.codeone.pl/api/watched/"+epId);
+
+            HttpResponse rp;
+            try {
+                rp = hc.execute(request);
+                
+                
+                if(rp.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    rp.getEntity().writeTo(out);
+                    out.close();
+                    String responseString = out.toString();
+                    return Integer.valueOf(responseString);
+                }
+            } catch (ClientProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return -1;
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            if(result > -1) {
+                if(elementView != null) {
+                    if(result == 1) {
+                        elementView.setBackgroundColor(Color.parseColor("#1d4a38"));
+                    } else {
+                        elementView.setBackgroundColor(Color.TRANSPARENT); 
+                    }
+                }
+                //getLoaderManager().restartLoader(0, null, context);
+            }
+        }
+    }
 }
+
+
