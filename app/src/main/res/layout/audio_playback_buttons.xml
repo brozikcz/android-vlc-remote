@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ImageButton
+        android:id="@+id/button_seek_backward"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/actionBarItemBackground"
+        style="?android:attr/actionButtonStyle"
+        android:contentDescription="@string/seek_backwards"
+        android:src="@drawable/ic_media_rew" />
+
+    <ImageButton
+        android:id="@+id/button_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/actionBarItemBackground"
+        style="?android:attr/actionButtonStyle"
+        android:contentDescription="@string/desc_button_stop"
+        android:src="@drawable/ic_media_stop" />
+
+    <ImageButton
+        android:id="@+id/button_pause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/actionBarItemBackground"
+        style="?android:attr/actionButtonStyle"
+        android:contentDescription="@string/desc_button_play_pause"
+        android:src="@drawable/ic_media_play" />
+
+    <ImageButton
+        android:id="@+id/button_seek_forward"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/actionBarItemBackground"
+        style="?android:attr/actionButtonStyle"
+        android:contentDescription="@string/seek_forwards"
+        android:src="@drawable/ic_media_ff" />
+
+</merge>

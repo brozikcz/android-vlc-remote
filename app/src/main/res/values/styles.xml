@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style
+        name="ToggleButton"
+        parent="android:Widget.Button">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minWidth">64dp</item>
+        <item name="android:minHeight">54dp</item>
+    </style>
+    <style name="actionButtonStyleSmall">
+        <item name="android:background">?android:selectableItemBackground</item>
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+    </style>
+    <style name="actionButtonStyleWide">
+        <item name="android:background">?android:selectableItemBackground</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:padding">8dp</item>
+    </style>
+
+</resources>
