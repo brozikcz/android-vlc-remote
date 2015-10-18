@@ -60,6 +60,9 @@ public final class MediaServer {
 
     private final String mAuthority;
 
+    public static boolean mIsMuted = false;
+    public static int mLastVolume = 0;
+
     public MediaServer(Context context, String authority) {
         mContext = context;
         Server s = Server.fromKey(authority + "#200;");
@@ -394,20 +397,37 @@ public final class MediaServer {
             }
 
             public void volume(int value) {
+                setLastVolume(value);
                 execute("command=volume&val=" + value);
             }
 
-            public void adjustVolume(int amount) {
-                String val = amount < 0 ? Integer.toString(amount) : "+" + amount;
-                execute("command=volume&val=" + Uri.encode(val));
-            }
-
             public void volumeDown() {
-                execute("command=volume&val=-20");
+                int change = getVolumeUpDown();
+                mLastVolume -= change;
+                execute("command=volume&val=-" + change);
             }
 
             public void volumeUp() {
-                execute("command=volume&val=%2B20");
+                int change = getVolumeUpDown();
+                mLastVolume += change;
+                execute("command=volume&val=%2B" + change);
+            }
+
+            public int getVolumeUpDown() {
+                return 20;
+            }
+
+            public void setLastVolume(int lastVolume) {
+                if(lastVolume > 0) {
+                    mLastVolume = lastVolume;
+                }
+            }
+
+            // The API doesn't have a documented mute function, so we're hacking our way around it
+            public void mute() {
+                int vol = mIsMuted ? mLastVolume : 0;
+                mIsMuted = !mIsMuted;
+                execute("command=volume&val=" + vol);
             }
 
             public void seek(String pos) {

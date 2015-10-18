@@ -32,10 +32,8 @@ import android.widget.Toast;
 
 import com.moonbloom.vlcremote.R;
 import com.moonbloom.vlcremote.intent.Intents;
-import com.moonbloom.vlcremote.listener.ButtonVisibilityListener;
 import com.moonbloom.vlcremote.listener.CommonPlaybackButtonsListener;
 import com.moonbloom.vlcremote.listener.MediaServerListener;
-import com.moonbloom.vlcremote.listener.UIVisibilityListener;
 import com.moonbloom.vlcremote.model.Preferences;
 import com.moonbloom.vlcremote.model.Reloadable;
 import com.moonbloom.vlcremote.model.Reloader;
@@ -43,7 +41,7 @@ import com.moonbloom.vlcremote.model.Status;
 import com.moonbloom.vlcremote.model.Tags;
 import com.moonbloom.vlcremote.net.MediaServer;
 
-public final class ButtonsFragment extends MediaFragment implements View.OnClickListener, View.OnLongClickListener, MediaServerListener, ButtonVisibilityListener, Reloadable {
+public final class ButtonsFragment extends MediaFragment implements View.OnClickListener, View.OnLongClickListener, MediaServerListener, Reloadable {
     
     private BroadcastReceiver mStatusReceiver;
 
@@ -51,8 +49,6 @@ public final class ButtonsFragment extends MediaFragment implements View.OnClick
     
     private ImageButton mButtonShuffle;
     private ImageButton mButtonRepeat;
-
-    private boolean isAllButtonsVisible;
     
     private boolean mRandom;
     private boolean mRepeat;
@@ -69,7 +65,6 @@ public final class ButtonsFragment extends MediaFragment implements View.OnClick
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        ((UIVisibilityListener) activity).setButtonVisibilityListener(this);
         ((Reloader) activity).addReloadable(Tags.FRAGMENT_BUTTONS, this);
     }
 
@@ -89,14 +84,14 @@ public final class ButtonsFragment extends MediaFragment implements View.OnClick
         
         mButtonShuffle = (ImageButton) view.findViewById(R.id.playlist_button_shuffle);
         mButtonRepeat = (ImageButton) view.findViewById(R.id.playlist_button_repeat);
+        ImageButton mButtonPlaylistToggleFullscreen = (ImageButton) view.findViewById(R.id.playlist_button_fullscreen);
         ImageButton mButtonPlaylistSkipBackward = (ImageButton) view.findViewById(R.id.button_skip_backward);
         ImageButton mButtonPlaylistSkipForward = (ImageButton) view.findViewById(R.id.button_skip_forward);
         ImageButton mButtonPlaylistSeekBackward = (ImageButton) view.findViewById(R.id.button_seek_backward);
         ImageButton mButtonPlaylistSeekForward = (ImageButton) view.findViewById(R.id.button_seek_forward);
-        isAllButtonsVisible = view.findViewById(R.id.audio_player_buttons_second_row) != null;
         getActivity().invalidateOptionsMenu();
 
-        setupImageButtonListeners(mButtonShuffle, mButtonRepeat, mButtonPlaylistSeekBackward, mButtonPlaylistSeekForward, mButtonPlaylistSkipBackward, mButtonPlaylistSkipForward);
+        setupImageButtonListeners(mButtonShuffle, mButtonRepeat, mButtonPlaylistSeekBackward, mButtonPlaylistSeekForward, mButtonPlaylistSkipBackward, mButtonPlaylistSkipForward, mButtonPlaylistToggleFullscreen);
         
         if(getResources().getConfiguration().screenWidthDp >= 400) {
             // seek buttons are displayed in playback fragment if >= 400dp
@@ -113,16 +108,6 @@ public final class ButtonsFragment extends MediaFragment implements View.OnClick
         }
     }
     
-    private void updateDVDButton() {
-        if(getView() == null) {
-            return;
-        }
-        ImageButton dvd = (ImageButton) getView().findViewById(R.id.button_navigation);
-        if(dvd != null && dvd.getTag() == null) {
-            dvd.setVisibility(Preferences.get(getActivity()).isHideDVDTabSet() ? View.GONE : View.VISIBLE);
-        }
-    }
-    
     private void hideImageButton(ImageButton... imageButtons) {
         for(ImageButton b : imageButtons) {
             if(b != null) {
@@ -132,18 +117,12 @@ public final class ButtonsFragment extends MediaFragment implements View.OnClick
     }
 
     @Override
-    public boolean isAllButtonsVisible() {
-        return isAllButtonsVisible;
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         mStatusReceiver = new StatusReceiver();
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intents.ACTION_STATUS);
         getActivity().registerReceiver(mStatusReceiver, filter);
-        updateDVDButton();
     }
 
     @Override
@@ -156,6 +135,9 @@ public final class ButtonsFragment extends MediaFragment implements View.OnClick
     /** {@inheritDoc} */
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.playlist_button_fullscreen:
+                getMediaServer().status().command.fullscreen();
+                break;
             case R.id.button_skip_backward:
                 getMediaServer().status().command.playback.previous();
                 break;

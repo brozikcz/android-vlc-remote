@@ -173,7 +173,7 @@ public class Server {
     /**
      * Creates an instance of server with the information represented in key
      * @param key Server key.
-     * @see toKey();
+     * @see Server#toKey();
      * @return Server
      */
     public static Server fromKey(String key) {

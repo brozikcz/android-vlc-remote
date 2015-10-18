@@ -54,10 +54,6 @@ public class PlaybackFragment extends MediaFragment implements View.OnClickListe
 
     private ImageButton mButtonPlaylistSeekBackward;
 
-    private ImageButton mButtonPlaylistChapterNext;
-
-    private ImageButton mButtonPlaylistChapterPrevious;
-
     private SeekBar mSeekPosition;
 
     private TextView mTextTime;
@@ -71,8 +67,6 @@ public class PlaybackFragment extends MediaFragment implements View.OnClickListe
         mButtonPlaylistStop = setupImageButton(v, R.id.button_stop);
         mButtonPlaylistSeekForward = setupImageButton(v, R.id.button_seek_forward);
         mButtonPlaylistSeekBackward = setupImageButton(v, R.id.button_seek_backward);
-        mButtonPlaylistChapterNext = setupImageButton(v, R.id.button_chapter_next);
-        mButtonPlaylistChapterPrevious = setupImageButton(v, R.id.button_chapter_previous);
 
         mSeekPosition = (SeekBar) v.findViewById(R.id.seek_progress);
         mSeekPosition.setMax(100);
@@ -114,10 +108,6 @@ public class PlaybackFragment extends MediaFragment implements View.OnClickListe
             command().seek(Uri.encode("-".concat(Preferences.get(getActivity()).getSeekTime())));
         } else if (v == mButtonPlaylistSeekForward) {
             command().seek(Uri.encode("+".concat(Preferences.get(getActivity()).getSeekTime())));
-        } else if (v == mButtonPlaylistChapterPrevious) {
-            command().key("chapter-prev");
-        } else if (v == mButtonPlaylistChapterNext) {
-            command().key("chapter-next");
         }
     }
 

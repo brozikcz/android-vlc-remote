@@ -22,7 +22,6 @@ package com.moonbloom.vlcremote.listener;
  * @author Sam Malone
  */
 public interface UIVisibilityListener {
-    public void setBottomActionbarFragmentVisible(boolean isVisible);
-    public void setButtonVisibilityListener(ButtonVisibilityListener l);
-    public void setVolumeFragmentVisible(boolean isVisible);
+    void setBottomActionbarFragmentVisible(boolean isVisible);
+    void setVolumeFragmentVisible(boolean isVisible);
 }

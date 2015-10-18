@@ -26,7 +26,6 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Browser;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -40,12 +39,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.CheckBox;
-import android.widget.ImageButton;
 import android.widget.SearchView;
-import android.widget.SlidingDrawer;
 import android.widget.TabHost;
 import android.widget.TabHost.TabContentFactory;
-import android.widget.ViewFlipper;
 
 import com.moonbloom.vlcremote.R;
 import com.moonbloom.vlcremote.fragment.ArtFragment;
@@ -59,8 +55,6 @@ import com.moonbloom.vlcremote.fragment.PlaylistFragment;
 import com.moonbloom.vlcremote.fragment.StatusFragment;
 import com.moonbloom.vlcremote.fragment.VolumeFragment;
 import com.moonbloom.vlcremote.intent.Intents;
-import com.moonbloom.vlcremote.listener.BrowseDrawerListener;
-import com.moonbloom.vlcremote.listener.ButtonVisibilityListener;
 import com.moonbloom.vlcremote.listener.MediaServerListener;
 import com.moonbloom.vlcremote.listener.UIVisibilityListener;
 import com.moonbloom.vlcremote.model.Preferences;
@@ -71,7 +65,6 @@ import com.moonbloom.vlcremote.model.Status;
 import com.moonbloom.vlcremote.model.Tags;
 import com.moonbloom.vlcremote.net.MediaServer;
 import com.moonbloom.vlcremote.net.xml.XmlContentHandler;
-import com.moonbloom.vlcremote.preference.WhatsNewDialog;
 import com.moonbloom.vlcremote.sweep.PortSweeper;
 import com.moonbloom.vlcremote.util.FragmentUtil;
 import com.moonbloom.vlcremote.widget.Buttons;
@@ -83,14 +76,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PlaybackActivity extends FragmentActivity implements TabHost.OnTabChangeListener, View.OnClickListener, UIVisibilityListener, Reloader {
+public class PlaybackActivity extends FragmentActivity implements TabHost.OnTabChangeListener, UIVisibilityListener, Reloader {
 
     private static final String TAG = "PlaybackActivity";
     
     private static final int REQUEST_PICK_SERVER = 1;
-
-    private static final Uri URI_INSTALL_GUIDE = Uri.parse("http://samicemalone.co.uk/remote-for-vlc/install.html");
-    private static final Uri URI_FAQS = Uri.parse("http://samicemalone.co.uk/remote-for-vlc/faq.html");
 
     private static final int VOLUME_LEVEL_UNKNOWN = -1;
 
@@ -121,8 +111,6 @@ public class PlaybackActivity extends FragmentActivity implements TabHost.OnTabC
     
     private boolean lastResponseError = false;
     
-    private ButtonVisibilityListener mButtonsVisibleListener;
-    
     private MediaServer mMediaServer;
 
     private TabHost mTabHost;
@@ -139,10 +127,6 @@ public class PlaybackActivity extends FragmentActivity implements TabHost.OnTabC
     
     private String mLastFileName; // used for comparing against current to detect change
 
-    private SlidingDrawer mDrawer;
-
-    private ViewFlipper mFlipper;
-    
     private LockableViewPager mPager;
     
     private String mRestoredSearch;
@@ -171,20 +155,18 @@ public class PlaybackActivity extends FragmentActivity implements TabHost.OnTabC
             mMediaServer = new MediaServer(this, authority);
             setServerSubtitle(pref.isServerSubtitleSet());
         }
-        
-        mFlipper = (ViewFlipper) findViewById(R.id.flipper);
+
         mPager = (LockableViewPager) findViewById(R.id.pager);
         mTabHost = (TabHost) findViewById(android.R.id.tabhost);
         mVolumePanel = new VolumePanel(this);
-        
-        BrowseFragment browse = null;
+
         FragmentUtil fu = new FragmentUtil(getSupportFragmentManager());
         fu.findOrAddFragment(Tags.FRAGMENT_STATUS, StatusFragment.class);
         
         if(mTabHost == null) {
             fu.findOrReplaceOptionalFragment(this, R.id.fragment_navigation, Tags.FRAGMENT_NAVIGATION, NavigationFragment.class);
             fu.findOrReplaceFragment(R.id.fragment_playlist, Tags.FRAGMENT_PLAYLIST, PlaylistFragment.class);
-            browse = fu.findOrReplaceFragment(R.id.fragment_browse, Tags.FRAGMENT_BROWSE, BrowseFragment.class);
+            fu.findOrReplaceFragment(R.id.fragment_browse, Tags.FRAGMENT_BROWSE, BrowseFragment.class);
             fu.findOrReplaceFragment(R.id.fragment_playback, Tags.FRAGMENT_PLAYBACK, PlaybackFragment.class);
             fu.findOrReplaceFragment(R.id.fragment_info, Tags.FRAGMENT_INFO, InfoFragment.class);
             fu.findOrReplaceOptionalFragment(this, R.id.fragment_art, Tags.FRAGMENT_ART, ArtFragment.class);
@@ -210,13 +192,6 @@ public class PlaybackActivity extends FragmentActivity implements TabHost.OnTabC
             }
         }
 
-        mDrawer = (SlidingDrawer) findViewById(R.id.drawer);
-        if (mDrawer != null) {
-            BrowseDrawerListener listener = new BrowseDrawerListener(this, mDrawer, browse);
-            mDrawer.setOnDrawerOpenListener(listener);
-            mDrawer.setOnDrawerCloseListener(listener);
-        }
-        
         if (savedInstanceState == null) {
             onNewIntent(getIntent());
         } else {
@@ -284,27 +259,6 @@ public class PlaybackActivity extends FragmentActivity implements TabHost.OnTabC
         }
     }
 
-    /** {@inheritDoc} */
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.button_navigation:
-                if(mTabHost == null) {
-                    mFlipper.showNext();
-                    updateNavigationButton(v);
-                } else {
-                    mTabHost.setCurrentTab(TAB_NAVIGATION_INDEX);
-                }
-                break;
-        }
-    }
-
-    private void updateNavigationButton(View v) {
-        ImageButton button = (ImageButton) v;
-        boolean on = (mFlipper.getDisplayedChild() != 0);
-        int icon = on ? R.drawable.ic_navigation_on : R.drawable.ic_navigation_off;
-        button.setImageResource(icon);
-    }
-
     @Override
     public boolean onSearchRequested() {
         String initialQuery = mInput;
@@ -334,11 +288,9 @@ public class PlaybackActivity extends FragmentActivity implements TabHost.OnTabC
         boolean isBrowseVisible = isCurrentTab(TAB_BROWSE);
         boolean isPlaylistVisible = mTabHost == null || isCurrentTab(TAB_PLAYLIST);
         boolean defaultVisibility = mTabHost == null || isCurrentTab(TAB_MEDIA) || isCurrentTab(TAB_NAVIGATION);
-        boolean isAllButtonsVisible = isBottomActionbarVisible || (mButtonsVisibleListener != null && mButtonsVisibleListener.isAllButtonsVisible());
+        boolean isAllButtonsVisible = isBottomActionbarVisible;
         boolean isButtonGroupVisible = isCurrentTab(TAB_MEDIA) && !isAllButtonsVisible;
         menu.findItem(R.id.menu_preferences).setVisible(defaultVisibility);
-        menu.findItem(R.id.menu_help_install).setVisible(defaultVisibility);
-        menu.findItem(R.id.menu_help_faqs).setVisible(defaultVisibility);
         MenuItem i = menu.findItem(R.id.menu_action_search).setVisible(isPlaylistVisible);
         onPrepareSearchView(i, isPlaylistVisible);
         menu.findItem(R.id.menu_clear_playlist).setVisible(isPlaylistVisible);
@@ -375,16 +327,6 @@ public class PlaybackActivity extends FragmentActivity implements TabHost.OnTabC
             case R.id.menu_preferences:
                 pickServer();
                 return true;
-            case R.id.menu_help_install:
-                Intent intent = new Intent(Intent.ACTION_VIEW, URI_INSTALL_GUIDE);
-                intent.putExtra(Browser.EXTRA_APPLICATION_ID, getPackageName());
-                startActivity(intent);
-                return true;
-            case R.id.menu_help_faqs:
-                Intent i = new Intent(Intent.ACTION_VIEW, URI_FAQS);
-                i.putExtra(Browser.EXTRA_APPLICATION_ID, getPackageName());
-                startActivity(i);
-                return true;
             case R.id.menu_action_button_first:
                 Buttons.sendCommand(mMediaServer, this, Preferences.KEY_BUTTON_FIRST);
                 return true;
@@ -404,12 +346,7 @@ public class PlaybackActivity extends FragmentActivity implements TabHost.OnTabC
                 return super.onOptionsItemSelected(item);
         }
     }
-    
-    @Override
-    public void setButtonVisibilityListener(ButtonVisibilityListener l) {
-        mButtonsVisibleListener = l;
-    }
-    
+
     @Override
     public void setBottomActionbarFragmentVisible(boolean isVisible) {
         isBottomActionbarVisible = isVisible;
@@ -579,11 +516,6 @@ public class PlaybackActivity extends FragmentActivity implements TabHost.OnTabC
         if(Preferences.get(this).isNotificationSet()) {
             startService(Intents.service(this, Intents.ACTION_NOTIFICATION_CREATE));
         }
-        WhatsNewDialog dialog = new WhatsNewDialog(this);
-        if(!dialog.hasUserSeenDialog()) {
-            dialog.setDialogAsSeen();
-            dialog.build().show();
-        }
     }
 
     @Override
@@ -608,14 +540,14 @@ public class PlaybackActivity extends FragmentActivity implements TabHost.OnTabC
         int c = event.getUnicodeChar();
         if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
             if (mVolumeLevel != VOLUME_LEVEL_UNKNOWN) {
-                setVolume(mVolumeLevel + 20);
+                setVolume(mVolumeLevel + mMediaServer.status().command.getVolumeUpDown());
             } else {
                 mMediaServer.status().command.volumeUp();
             }
             return true;
         } else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
             if (mVolumeLevel != VOLUME_LEVEL_UNKNOWN) {
-                setVolume(mVolumeLevel - 20);
+                setVolume(mVolumeLevel - mMediaServer.status().command.getVolumeUpDown());
             } else {
                 mMediaServer.status().command.volumeDown();
             }

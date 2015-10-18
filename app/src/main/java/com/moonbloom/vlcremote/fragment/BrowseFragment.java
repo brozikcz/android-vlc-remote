@@ -279,7 +279,7 @@ public class BrowseFragment extends MediaListFragment implements LoaderManager.L
                     openDirectory(file);
                     return true;
                 case R.id.browse_context_play:
-                    List<String> dirs = new ArrayList<String>(mAdapter.getRealPaths(file));
+                    List<String> dirs = new ArrayList<>(mAdapter.getRealPaths(file));
                     if(dirs.isEmpty()) {
                         Toast.makeText(getActivity(), "Error: unable to find real path", Toast.LENGTH_SHORT).show();
                         return true;
@@ -327,7 +327,7 @@ public class BrowseFragment extends MediaListFragment implements LoaderManager.L
     }
     
     private void displayAddToLibraryDialog(final File file) {
-        final List<String> libraries = new ArrayList<String>(mPreferences.getLibraries());
+        final List<String> libraries = new ArrayList<>(mPreferences.getLibraries());
         libraries.add(0, getString(R.string.context_add_library_new));
         new AlertDialog.Builder(getActivity())
             .setItems(libraries.toArray(new String[0]), new DialogInterface.OnClickListener() {
@@ -377,7 +377,7 @@ public class BrowseFragment extends MediaListFragment implements LoaderManager.L
     }
     
     private void displayRemoveFromLibraryDialog(final File file) {
-        final List<String> libraryDirs = new ArrayList<String>(mPreferences.getLibraryDirectories(file.getName()));
+        final List<String> libraryDirs = new ArrayList<>(mPreferences.getLibraryDirectories(file.getName()));
         new AlertDialog.Builder(getActivity())
             .setItems(libraryDirs.toArray(new String[0]), new DialogInterface.OnClickListener() {
                 @Override
@@ -387,7 +387,7 @@ public class BrowseFragment extends MediaListFragment implements LoaderManager.L
                         mPreferences.removeLibrary(file.getName());
                         openDirectory(mDirectory, Data.LIBRARIES);
                     } else {
-                        mPreferences.setLibrary(file.getName(), new HashSet<String>(libraryDirs));
+                        mPreferences.setLibrary(file.getName(), new HashSet<>(libraryDirs));
                     }
                     dialog.dismiss();
                 }

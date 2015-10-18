@@ -1,10 +1,6 @@
 
 package com.moonbloom.vlcremote.fragment;
 
-import com.moonbloom.vlcremote.R;
-import com.moonbloom.vlcremote.intent.Intents;
-import com.moonbloom.vlcremote.model.Status;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -15,13 +11,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
-public class VolumeFragment extends MediaFragment implements SeekBar.OnSeekBarChangeListener {
+import com.moonbloom.vlcremote.R;
+import com.moonbloom.vlcremote.intent.Intents;
+import com.moonbloom.vlcremote.model.Status;
+
+public class VolumeFragment extends MediaFragment implements SeekBar.OnSeekBarChangeListener, View.OnClickListener {
 
     private static final int MAX_VOLUME = 512;
 
     private ImageView mIcon;
     private SeekBar mSeekBar;
+    private TextView mVolumeText;
 
     private BroadcastReceiver mStatusReceiver;
 
@@ -30,7 +32,9 @@ public class VolumeFragment extends MediaFragment implements SeekBar.OnSeekBarCh
         View view = inflater.inflate(R.layout.volume_fragment, root, false);
         mIcon = (ImageView) view.findViewById(android.R.id.icon);
         mSeekBar = (SeekBar) view.findViewById(android.R.id.progress);
+        mIcon.setOnClickListener(this);
         mSeekBar.setOnSeekBarChangeListener(this);
+        mVolumeText = (TextView) view.findViewById(R.id.volume_text);
         return view;
     }
 
@@ -52,11 +56,19 @@ public class VolumeFragment extends MediaFragment implements SeekBar.OnSeekBarCh
 
     private void setVolume(int value) {
         getMediaServer().status().command.volume(value);
+        updateVolumeText(value);
+    }
+
+    private void updateVolumeText(int volume) {
+        long calcVolume = Math.round(volume / 2.56);
+        mVolumeText.setText(calcVolume + "%");
     }
 
     void onVolumeChanged(int value) {
+        getMediaServer().status().command.setLastVolume(value);
         mIcon.setImageResource(getVolumeImage(value));
         mSeekBar.setProgress(value);
+        updateVolumeText(value);
     }
 
     private static int getVolumeImage(int volume) {
@@ -85,6 +97,11 @@ public class VolumeFragment extends MediaFragment implements SeekBar.OnSeekBarCh
         getActivity().unregisterReceiver(mStatusReceiver);
         mStatusReceiver = null;
         super.onPause();
+    }
+
+    @Override
+    public void onClick(View v) {
+        getMediaServer().status().command.mute();
     }
 
     private class StatusReceiver extends BroadcastReceiver {

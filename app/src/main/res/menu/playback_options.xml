@@ -18,14 +18,6 @@
             android:showAsAction="always" />
     </group>
     <item
-        android:id="@+id/menu_help_install"
-        android:title="@string/install_guide"
-        android:icon="@drawable/ic_menu_help" />
-    <item
-        android:id="@+id/menu_help_faqs"
-        android:title="@string/faqs"
-        android:icon="@drawable/ic_menu_help" />
-    <item
         android:id="@+id/menu_preferences"
         android:title="@string/settings"
         android:icon="@drawable/ic_menu_preferences"

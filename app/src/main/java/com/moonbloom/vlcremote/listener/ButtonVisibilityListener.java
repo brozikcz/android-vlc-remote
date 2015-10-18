@@ -22,5 +22,5 @@ package com.moonbloom.vlcremote.listener;
  * @author Sam Malone
  */
 public interface ButtonVisibilityListener {
-    public boolean isAllButtonsVisible();    
+    boolean isAllButtonsVisible();
 }

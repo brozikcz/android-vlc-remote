@@ -45,8 +45,6 @@ import com.moonbloom.vlcremote.widget.RemoteViewsFactory;
  * next track buttons.
  */
 public class MediaAppWidgetProvider extends AppWidgetProvider {
-    
-    public static final String LOG_TAG = "VlcRemoteAppWidgetProvider";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -71,8 +69,6 @@ public class MediaAppWidgetProvider extends AppWidgetProvider {
 
     /**
      * Schedule an update shortly after the current track is expected to end
-     * @param context
-     * @param status
      */
     public static void scheduleUpdate(Context context, Status status) {
         long time = status.getTime();
@@ -81,7 +77,7 @@ public class MediaAppWidgetProvider extends AppWidgetProvider {
             long delay = (length - time + 1) * 1000;
             scheduleUpdate(context, delay);
         } else if(status.isPaused()) {
-            scheduleUpdate(context, 1000 * 60 * 15); // check again in 15 mins
+            scheduleUpdate(context, 1000 * 60 * 15); // check again in 15 minutes
         }
     }
     
