@@ -39,10 +39,10 @@ public class PlayingFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup root, Bundle savedInstanceState) {
         View v =  inflater.inflate(R.layout.playing_fragment, root, false);
         FragmentUtil fu = new FragmentUtil(getChildFragmentManager());
-        fu.findOrReplaceFragment(R.id.fragment_playback, Tags.FRAGMENT_PLAYBACK, PlaybackFragment.class);
         fu.findOrReplaceFragment(R.id.fragment_info, Tags.FRAGMENT_INFO, InfoFragment.class);
-        fu.findOrReplaceFragment(R.id.fragment_buttons, Tags.FRAGMENT_BUTTONS, ButtonsFragment.class);
         VolumeFragment mVolume = fu.findOrReplaceOptionalFragment(v, R.id.fragment_volume, Tags.FRAGMENT_VOLUME, VolumeFragment.class);
+        fu.findOrReplaceFragment(R.id.fragment_buttons, Tags.FRAGMENT_BUTTONS, ButtonsFragment.class);
+        fu.findOrReplaceFragment(R.id.fragment_playback, Tags.FRAGMENT_PLAYBACK, PlaybackFragment.class);
         BottomActionbarFragment mBottomActionBar = fu.findOrReplaceOptionalFragment(v, R.id.fragment_bottom_actionbar, Tags.FRAGMENT_BOTTOMBAR, BottomActionbarFragment.class);
         UIVisibilityListener ui = (PlaybackActivity) getActivity();
         // notify activity about optional fragments visibility
